@@ -161,6 +161,3 @@ Files are automatically saved with timestamps:
 - `data/processed/corpus_with_sentiment_YYYYMMDD_NNN.csv`
 - `data/figures/sentiment_over_time_YYYYMMDD_NNN.png`
 
-## License
-
-MIT License
