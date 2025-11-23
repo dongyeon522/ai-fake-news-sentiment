@@ -1,0 +1,10 @@
+requests
+beautifulsoup4
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+textblob
+rank-bm25
+python-dotenv
