@@ -183,13 +183,12 @@ The pipeline generates three output files:
 
 The `presentation/` folder contains project documentation and demonstration materials:
 
-- **final report.pptx**: Project report presentation slides covering:
+- **final report.mp4**: Project report presentation slides covering:
   - Project overview and objectives
   - Methodology and implementation details
   - Results and analysis
   - Conclusions
-
-- **final report.mp4**: Presentation Video.
+  - How to run the code
 
 These materials provide comprehensive documentation of the project and serve as a guide for understanding and using the codebase.
 
