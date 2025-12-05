@@ -29,7 +29,7 @@ ai-fake-news-sentiment/
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/dongyeon522/ai-fake-news-sentiment
 cd ai-fake-news-sentiment
 ```
 
