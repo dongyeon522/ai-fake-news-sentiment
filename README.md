@@ -21,6 +21,9 @@ ai-fake-news-sentiment/
 │   ├── ranking.py    # Ranking algorithms (TF-IDF, BM25)
 │   ├── evaluate.py   # Evaluation metrics
 │   └── visualize.py  # Visualization
+├── presentation/     # Project presentation materials
+│   ├── final report.pptx  # Project report presentation
+│   └── final report.mp4   # Video demonstration
 ├── main.py           # Main execution script
 └── requirements.txt
 ```
@@ -175,5 +178,22 @@ The pipeline generates three output files:
 - **RoBERTa**: Slower but more accurate. First run downloads ~500MB model (cached for subsequent runs)
 - **Rate Limiting**: Optimized retry logic with 15-second default wait time (reduced from 60 seconds)
 - **Progress Display**: Real-time progress updates during data collection
+
+## Presentation
+
+The `presentation/` folder contains project documentation and demonstration materials:
+
+- **final report.pptx**: Project report presentation slides covering:
+  - Project overview and objectives
+  - Methodology and implementation details
+  - Results and analysis
+  - Conclusions and future work
+
+- **final report.mp4**: Video demonstration showing:
+  - How to set up and run the project
+  - Step-by-step code execution
+  - Results visualization and interpretation
+
+These materials provide comprehensive documentation of the project and serve as a guide for understanding and using the codebase.
 
 ## License
