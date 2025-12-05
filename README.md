@@ -4,6 +4,15 @@ UIUC CS410 Final Project — Fall 2025
 AI Fake News Sentiment Tracking and Trend Analysis  
 A Python-based system for news retrieval, sentiment analysis (TextBlob & RoBERTa), and temporal trend visualization.
 
+
+**Project Code + Documentation Submission Link**: https://github.com/dongyeon522/ai-fake-news-sentiment
+
+**Project Presentation Submission Link**: https://mediaspace.illinois.edu/media/t/1_e137pu64 or [here](https://github.com/dongyeon522/ai-fake-news-sentiment/blob/main/CS410_Project_Presentation_dk72.mp4)
+
+**Final Report Link**: https://github.com/dongyeon522/ai-fake-news-sentiment/blob/main/final_report.docx
+
+**TextData Link**: https://textdata.org/submissions/68eb8d21d79b5a018fcc4039 
+
 ---
 
 ## Author
