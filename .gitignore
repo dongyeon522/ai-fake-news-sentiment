@@ -37,8 +37,9 @@ ENV/
 .env
 
 # Data files (preserve directory structure but ignore specific files)
-data/raw/*.csv
-data/processed/*.csv
+# Note: Specific data files can be committed if needed
+# data/raw/*.csv
+# data/processed/*.csv
 data/raw/*.json
 data/processed/*.json
 data/request_log.json
