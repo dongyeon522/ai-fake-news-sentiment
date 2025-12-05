@@ -187,12 +187,9 @@ The `presentation/` folder contains project documentation and demonstration mate
   - Project overview and objectives
   - Methodology and implementation details
   - Results and analysis
-  - Conclusions and future work
+  - Conclusions
 
-- **final report.mp4**: Video demonstration showing:
-  - How to set up and run the project
-  - Step-by-step code execution
-  - Results visualization and interpretation
+- **final report.mp4**: Presentation Video.
 
 These materials provide comprehensive documentation of the project and serve as a guide for understanding and using the codebase.
 
