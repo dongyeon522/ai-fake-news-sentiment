@@ -1,33 +1,55 @@
-# AI Fake News Sentiment Analysis
+# AI Fake News Sentiment Tracking and Analysis
 
-A sentiment analysis and ranking pipeline for AI-related fake news articles.
+## Documentation Note
+This README serves as the official documentation required for the software code submission.  
+It includes:
+- **How to use the software** (installation, configuration, and execution)
+- **How the software is implemented** (module-level explanations and processing pipeline)
 
-## Project Overview
+## Overview
+This project analyzes public perception of AI-generated fake news, deepfakes, and misinformation by collecting news articles and evaluating their sentiment over time.  
+The system integrates:
 
-This project collects AI-related news articles, performs sentiment analysis, and ranks them by relevance. It uses the New York Times Article Search API to gather articles and analyzes sentiment using either TextBlob (fast, rule-based) or RoBERTa (slower, more accurate).
+- Article retrieval (via the New York Times Article Search API)
+- Text preprocessing and corpus construction
+- Sentiment analysis using **TextBlob** and **RoBERTa**
+- Retrieval ranking using TF-IDF and BM25
+- Sentiment trend visualization across months
 
-## Project Structure
+By comparing lightweight lexicon-based models with transformer-based sentiment classifiers, the system reveals how media framing of AI-related misinformation differs depending on model sensitivity and context awareness.
 
-```
-ai-fake-news-sentiment/
-├── data/
-│   ├── raw/          # Raw news data
-│   ├── processed/    # Processed data
-│   └── figures/      # Generated visualizations
-├── src/
-│   ├── collector.py  # News collector
-│   ├── preprocess.py # Text preprocessing
-│   ├── sentiment.py  # Sentiment analysis
-│   ├── ranking.py    # Ranking algorithms (TF-IDF, BM25)
-│   ├── evaluate.py   # Evaluation metrics
-│   └── visualize.py  # Visualization
-├── presentation/     # Project presentation materials
-│   ├── final report.pptx  # Project report presentation
-│   └── final report.mp4   # Video demonstration
-├── main.py           # Main execution script
-└── requirements.txt
-```
+### Automated News Retrieval
+- Uses the NYT Article Search API  
+- Runs monthly queries for four topics:
+  - “artificial intelligence”
+  - “deepfake”
+  - “fake news”
+  - “misinformation”
+- Automatically handles rate limits and retries  
+- Produces raw CSV files under `data/raw/`
 
+### Text Preprocessing
+- Concatenates `title + description + content` into a clean text block  
+- Normalizes whitespace  
+- Produces processed datasets with unified text fields
+
+### Sentiment Analysis
+Supports two models:
+
+| Model | Type | Behavior |
+|-------|------|----------|
+| **TextBlob** | Lexicon-based | Conservative, near-neutral scoring |
+| **RoBERTa** | Transformer-based | Captures nuanced, contextual negativity |
+
+### Visualization
+- Generates time-series monthly sentiment plots  
+- Saves figures to `data/figures/`
+
+### Ranking & Evaluation
+- TF-IDF and BM25 ranking modules  
+- Evaluation utilities for examining sentiment distributions  
+
+---
 ## Installation
 
 1. Clone the repository:
@@ -53,10 +75,7 @@ pip install -r requirements.txt
 ```bash
 cp .env.example .env
 ```
-
-## Usage
-
-### Run the complete pipeline:
+5. Run the complete pipeline:
 
 ```bash
 python3 main.py
@@ -67,33 +86,44 @@ Or use the convenience script:
 ```bash
 ./run.sh
 ```
+---
+## Implementation Details
 
-This will:
-1. Collect news articles from NYT API (monthly search mode)
-2. Preprocess the data
-3. **Prompt you to select sentiment analysis method** (TextBlob or RoBERTa)
-4. Perform sentiment analysis
-5. Evaluate results
-6. Run ranking experiments
-7. Generate visualizations
+The source code is organized into modular components:
 
-**Note**: When running, you'll be prompted to choose between:
-- **TextBlob**: Faster, rule-based sentiment analysis
-- **RoBERTa**: Slower but more accurate deep learning-based sentiment analysis
+### `collector.py` — Article Retrieval
+- Interfaces with the NYT Article Search API  
+- Performs month-by-month queries  
+- Ensures full 2024 coverage across four keywords  
+- Handles rate limits and retry logic  
+- Saves raw article data to CSV  
 
-## Features
+### `preprocess.py` — Text Cleaning
+- Merges `title`, `description`, and `content` fields  
+- Fills missing values with empty strings  
+- Produces a unified `text` field for each article  
 
-- **News Collection**: Collect news articles via New York Times Article Search API
-- **Monthly Search**: Automatically splits queries by month for better temporal coverage
-- **Preprocessing**: URL removal, text normalization
-- **Sentiment Analysis**: 
-  - **TextBlob**: Fast, rule-based sentiment analysis
-  - **RoBERTa**: Deep learning-based sentiment analysis (more accurate)
-- **Ranking**: TF-IDF and BM25 algorithms for relevance ranking
-- **Evaluation**: Comprehensive sentiment distribution statistics with configurable thresholds
-- **Visualization**: Time-series visualization of sentiment changes
-- **Rate Limiting**: Automatic rate limit management and retry logic (optimized wait times)
-- **Progress Tracking**: Real-time progress display during data collection
+### `sentiment.py` — Sentiment Modeling
+- **TextBlob:** lightweight lexicon-based polarity scoring  
+- **RoBERTa:** transformer-based sentiment classifier  
+- Adds sentiment score to each processed article  
+
+### `ranking.py` — TF-IDF & BM25 Ranking
+- Builds TF-IDF and BM25 vectorizers  
+- Enables retrieval and ranking experiments  
+
+### `evaluate.py` — Sentiment Statistics
+- Computes positive, neutral, and negative proportions  
+- Supports custom sentiment threshold configurations  
+
+### `visualize.py` — Plotting
+- Generates monthly sentiment line charts  
+- Supports visualization for both sentiment models  
+
+### `main.py` — Orchestration
+- Runs the full retrieval → preprocessing → sentiment → evaluation → visualization pipeline  
+- Allows selection of the sentiment model at runtime  
+- Produces final processed CSVs and figures  
 
 ## Configuration
 
@@ -131,6 +161,61 @@ stats = evaluate_sentiment_distribution(df)
 # Custom thresholds
 stats = evaluate_sentiment_distribution(df, pos_th=0.2, neg_th=-0.2)
 ```
+---
+## Project Structure
+
+```
+ai-fake-news-sentiment/
+├── data/
+│   ├── raw/          # Raw news data
+│   ├── processed/    # Processed data
+│   └── figures/      # Generated visualizations
+├── src/
+│   ├── collector.py  # News collector
+│   ├── preprocess.py # Text preprocessing
+│   ├── sentiment.py  # Sentiment analysis
+│   ├── ranking.py    # Ranking algorithms (TF-IDF, BM25)
+│   ├── evaluate.py   # Evaluation metrics
+│   └── visualize.py  # Visualization
+├── presentation/     # Project presentation materials
+│   ├── final report.pptx  # Project report presentation
+│   └── final report.mp4   # Video demonstration
+├── main.py           # Main execution script
+└── requirements.txt
+```
+
+
+
+
+
+This will:
+1. Collect news articles from NYT API (monthly search mode)
+2. Preprocess the data
+3. **Prompt you to select sentiment analysis method** (TextBlob or RoBERTa)
+4. Perform sentiment analysis
+5. Evaluate results
+6. Run ranking experiments
+7. Generate visualizations
+
+**Note**: When running, you'll be prompted to choose between:
+- **TextBlob**: Faster, rule-based sentiment analysis
+- **RoBERTa**: Slower but more accurate deep learning-based sentiment analysis
+
+## Features
+
+- **News Collection**: Collect news articles via New York Times Article Search API
+- **Monthly Search**: Automatically splits queries by month for better temporal coverage
+- **Preprocessing**: URL removal, text normalization
+- **Sentiment Analysis**: 
+  - **TextBlob**: Fast, rule-based sentiment analysis
+  - **RoBERTa**: Deep learning-based sentiment analysis (more accurate)
+- **Ranking**: TF-IDF and BM25 algorithms for relevance ranking
+- **Evaluation**: Comprehensive sentiment distribution statistics with configurable thresholds
+- **Visualization**: Time-series visualization of sentiment changes
+- **Rate Limiting**: Automatic rate limit management and retry logic (optimized wait times)
+- **Progress Tracking**: Real-time progress display during data collection
+
+
 
 ## Output Files
 
@@ -179,17 +264,7 @@ The pipeline generates three output files:
 - **Rate Limiting**: Optimized retry logic with 15-second default wait time (reduced from 60 seconds)
 - **Progress Display**: Real-time progress updates during data collection
 
-## Presentation
 
-The `presentation/` folder contains project documentation and demonstration materials:
-
-- **final report.mp4**: Project report presentation slides covering:
-  - Project overview and objectives
-  - Methodology and implementation details
-  - Results and analysis
-  - Conclusions
-  - How to run the code
-
-These materials provide comprehensive documentation of the project and serve as a guide for understanding and using the codebase.
 
 ## License
+This project is released for academic coursework submission and is not licensed for commercial use.
