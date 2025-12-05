@@ -264,6 +264,107 @@ The pipeline generates three output files:
 - **Rate Limiting**: Optimized retry logic with 15-second default wait time (reduced from 60 seconds)
 - **Progress Display**: Real-time progress updates during data collection
 
+---
+# Final Report
+
+This is a final report and the same content can be found in Textdata with following url:
+https://textdata.org/submissions/68eb8d21d79b5a018fcc4039
+
+#project #report
+
+**Overview**
+
+This project aims to analyze how the public perceives AI-generated fake news, deepfakes, and misinformation by collecting related news articles and examining their sentiment. By ranking articles with TF-IDF and BM25 and applying sentiment analysis models such as TextBlob or RoBERTa, the system approximates public reactions reflected in media tone. The goal is to provide a simple, unified workflow that retrieves relevant articles, measures sentiment trends over time, and evaluates retrieval performance using standard IR metrics.
+
+**Progress Made**
+
+Project code: https://github.com/dongyeon522/ai-fake-news-sentiment
+ 
+Presentation video: https://mediaspace.illinois.edu/media/t/1_e137pu64
+
+**(a)	Initial Retrieval and Collection Pipeline**
+
+- Implemented a month-by-month retrieval strategy for the full year of 2024.
+- For each month, the system executed four distinct search queries targeting AI misinformation topics:
+
+1.	"artificial intelligence"
+2.	"deepfake"
+3.	"fake news"
+4.	"misinformation"
+
+- For every query–month pair, the system requested up to 10 articles (NYT API page limit), resulting in:
+    - 12 months × 4 queries = 48 total API calls
+    - Up to 480 articles possible, with 459 successfully collected after removing duplicates
+    - Monthly splitting ensured that all months of 2024 were represented, allowing a balanced temporal analysis.
+
+**(b)	Text Preprocessing and Corpus Construction**
+
+- Implemented a preprocessing module that concatenates each article’s **title, description, and content** into a single `text` field.
+- Filled missing fields with empty strings and normalized basic whitespace so that every row has a clean, model-ready text block.
+- Starting from the raw NYT API export (`data/raw/articles_YYYYMMDD_XXX.csv`), the pipeline produces a processed file  
+  `data/processed/corpus_with_sentiment_YYYYMMDD_XXX.csv` that adds the unified `text` column and a `sentiment` score for each article.
+
+**(c)	Sentiment Analysis**
+
+Two sentiment models were applied:
+
+1. **TextBlob** (lexicon-based polarity model)  
+2. **RoBERTa** (transformer-based classifier)
+
+Their monthly sentiment trends show clear differences in sensitivity and range.
+
+(1) TextBlob Sentiment Trend
+
+![TextBlob result](data/figures/sentiment_over_time_20251205_002.png)
+https://github.com/dongyeon522/ai-fake-news-sentiment/blob/main/data/figures/sentiment_over_time_20251205_002.png
+
+**Observations:**
+- Sentiment remains close to **neutral**, with only minor fluctuations.
+- This behavior reflects TextBlob's tendency to compress polarity for formal news text.
+- Positive/negative classification used the common threshold **±0.1**.
+
+(2) RoBERTa Sentiment Trend
+
+![RoBERTa result](data/figures/sentiment_over_time_20251205_004.png)
+https://github.com/dongyeon522/ai-fake-news-sentiment/blob/main/data/figures/sentiment_over_time_20251205_004.png
+
+**Observations:**
+- RoBERTa produces **stronger negative sentiment** across the year.
+- Negative dips occur around:
+  - **February (–0.25)**
+  - **April–June (–0.18 to –0.22)**
+  - **Late fall (–0.20 to –0.36)**
+- This model captures nuance such as concern, risk framing, or negative social impact.
+- Sharp contrast with TextBlob reveals the importance of model selection.
+
+
+**Interpretation**
+- **TextBlob** indicates that AI misinformation articles appear neutral in tone overall.
+- **RoBERTa**, however, reveals **consistently negative framing**, with notable dips aligning with:
+  - regulatory debates,
+  - high-profile misuse incidents,
+  - or controversies involving major AI firms.
+
+The divergence highlights how transformer-based models better detect subtle negativity present in journalistic descriptions of AI risk, misinformation, and deepfake threats.
+
+**Challenges / Issues Encountered**
+
+**(a)	API Constraints**
+- NYT API provides only 10 items per page.  
+- Used monthly splitting to avoid missing data.
+- Some months contain inherently fewer AI-misinformation stories.
+
+(b)	Sentiment Model Limitations
+- TextBlob polarity compresses toward zero for formal writing.
+- RoBERTa is more expressive but computationally more costly.
+
+**Conclusion**
+
+- The project successfully built an end-to-end pipeline that retrieves AI-misinformation news, preprocesses text, and analyzes sentiment over time.
+- TextBlob showed sentiment clustered near neutrality, reflecting its limitations in detecting nuanced tone in formal news writing.
+- RoBERTa revealed consistently negative sentiment throughout 2024, capturing concern-driven or risk-oriented framing that lexicon models fail to detect.
+- The contrast between the two models highlights the importance of model selection for analyzing subtle or context-dependent sentiment in news media.
+- Despite API rate limits and variability in model behavior, the system provides a practical foundation for monitoring public sentiment toward AI misinformation and can be extended with more robust retrieval evaluation and advanced semantic models.
 
 
 ## License
