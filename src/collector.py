@@ -97,23 +97,43 @@ class NewsCollector:
                 raise Exception("Authentication failed. Check API key.")
             elif resp.status_code == 429:
                 # Retry logic when rate limit exceeded
-                retry_after = resp.headers.get('Retry-After', 60)  # Default 60 seconds wait
-                print(f"      ⚠ Rate limit exceeded. Retrying after {retry_after} seconds...")
-                time.sleep(int(retry_after))
+                # Use API-provided Retry-After if available, otherwise use shorter default
+                retry_after = resp.headers.get('Retry-After')
+                if retry_after:
+                    retry_after = int(retry_after)
+                else:
+                    # Shorter default wait time (15 seconds instead of 60)
+                    retry_after = 15
+                
+                print(f"      WARNING: Rate limit exceeded. Waiting {retry_after} seconds before retry...")
+                print(f"      Progress: {self.request_count}/{self.DAILY_LIMIT} requests used")
+                time.sleep(retry_after)
                 # Retry
                 resp = requests.get(self.base_url, params=params)
                 if resp.status_code == 429:
-                    raise Exception(f"Rate limit exceeded. Please try again after {retry_after} seconds.")
+                    # If still rate limited, wait a bit longer
+                    retry_after = 30
+                    print(f"      Still rate limited. Waiting {retry_after} more seconds...")
+                    time.sleep(retry_after)
+                    resp = requests.get(self.base_url, params=params)
+                    if resp.status_code == 429:
+                        raise Exception(f"Rate limit exceeded. Please try again later.")
             elif resp.status_code != 200:
                 resp.raise_for_status()
             
             # Add delay between requests (prevent per-minute rate limit)
             if page < max_pages - 1:  # If not last page
-                time.sleep(0.5)  # Wait 0.5 seconds
+                time.sleep(1.0)  # Increased to 1 second to avoid rate limiting
             
-            # Increment and save request count
+            # Progress indicator for long-running operations
+            if page == 0:
+                print(f"    Processing page {page + 1}/{max_pages}...")
+            
+            # Increment request count (save in batches for better performance)
             self.request_count += 1
-            self._save_request_count()
+            # Save every 10 requests instead of every request
+            if self.request_count % 10 == 0:
+                self._save_request_count()
             
             data = resp.json()
             
@@ -217,7 +237,7 @@ class NewsCollector:
             
             if self.request_count + total_searches > self.DAILY_LIMIT:
                 available = self.DAILY_LIMIT - self.request_count
-                print(f"\n  ⚠ Warning: May exceed request limit.")
+                print(f"\n  WARNING: May exceed request limit.")
                 print(f"  Available requests: {available}, Required: {total_searches}")
                 # Only show warning, don't auto-adjust
             
@@ -225,16 +245,18 @@ class NewsCollector:
             for q_idx, q in enumerate(queries, 1):
                 for month_idx, (month_start, month_end) in enumerate(date_ranges, 1):
                     if not self._check_rate_limit():
-                        print(f"\n  ⚠ Rate limit reached. {search_count}/{total_searches} searches completed.")
+                        print(f"\n  WARNING: Rate limit reached. {search_count}/{total_searches} searches completed.")
                         break
                     
                     search_count += 1
                     month_label = pd.to_datetime(month_start).strftime('%Y-%m')
-                    print(f"  [{search_count}/{total_searches}] Processing query '{q}' ({month_label})... (Request {self.request_count + 1}/{self.DAILY_LIMIT}, max {page_size} articles)")
+                    print(f"\nretrieving {month_label} data... (query: '{q}')", flush=True)
+                    print(f"  Progress: {search_count}/{total_searches} searches ({search_count/total_searches*100:.1f}%)", flush=True)
+                    print(f"  Request {self.request_count + 1}/{self.DAILY_LIMIT}, max {page_size} articles", flush=True)
                     
                     try:
                         articles = self.fetch_articles(q, month_start, month_end, page_size=page_size)
-                        print(f"    → Collected {len(articles)} articles")
+                        print(f"  Collected {len(articles)} articles", flush=True)
                         
                         for a in articles:
                             all_articles.append({
@@ -248,7 +270,7 @@ class NewsCollector:
                                 "published_at": a.get("published_at", ""),
                             })
                     except Exception as e:
-                        print(f"    ✗ Error occurred: {e}")
+                        print(f"    Error occurred: {e}")
                         # Continue even if some monthly searches fail
                         continue
                 
@@ -265,7 +287,7 @@ class NewsCollector:
             
             if self.request_count + remaining_queries > self.DAILY_LIMIT:
                 available = self.DAILY_LIMIT - self.request_count
-                print(f"\n  ⚠ Warning: May exceed request limit.")
+                print(f"\n  WARNING: May exceed request limit.")
                 print(f"  Available requests: {available}, Required: {remaining_queries}")
                 response = input(f"  Process only {available} queries? (y/n): ")
                 if response.lower() == 'y':
@@ -274,13 +296,13 @@ class NewsCollector:
             
             for i, q in enumerate(queries, 1):
                 if not self._check_rate_limit():
-                    print(f"\n  ⚠ Rate limit reached. {i-1}/{len(queries)} queries completed.")
+                    print(f"\n  WARNING: Rate limit reached. {i-1}/{len(queries)} queries completed.")
                     break
                 
                 print(f"  [{i}/{len(queries)}] Processing query '{q}'... (Request {self.request_count + 1}/{self.DAILY_LIMIT}, max {page_size} articles)")
                 try:
                     articles = self.fetch_articles(q, from_date, to_date, page_size=page_size)
-                    print(f"    → Collected {len(articles)} articles")
+                    print(f"    Collected {len(articles)} articles")
                     
                     for a in articles:
                         all_articles.append({
@@ -300,10 +322,13 @@ class NewsCollector:
         if len(all_articles) == 0:
             raise Exception("No articles collected.")
         
+        # Save final request count
+        self._save_request_count()
+        
         df = pd.DataFrame(all_articles)
         df.to_csv(out_path, index=False)
-        print(f"\n  ✓ Collected {len(df)} articles in total.")
-        print(f"  ✓ Remaining requests: {self.DAILY_LIMIT - self.request_count}/{self.DAILY_LIMIT}")
+        print(f"\n  Collected {len(df)} articles in total.")
+        print(f"  Remaining requests: {self.DAILY_LIMIT - self.request_count}/{self.DAILY_LIMIT}")
         return df
     
     def get_remaining_requests(self) -> int:

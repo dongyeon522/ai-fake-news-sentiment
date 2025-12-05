@@ -8,3 +8,5 @@ seaborn
 textblob
 rank-bm25
 python-dotenv
+transformers
+torch

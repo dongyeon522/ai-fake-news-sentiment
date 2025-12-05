@@ -91,7 +91,7 @@ def plot_sentiment_over_time(df: pd.DataFrame, time_col: str = "published_at", f
     
     # Save to file
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    print(f"  ✓ Visualization saved: {save_path}")
+    print(f"  Visualization saved: {save_path}")
     
     # Also display on screen
     plt.show()

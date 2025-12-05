@@ -1,6 +1,7 @@
 # src/ranking.py
 from typing import List, Tuple
 import pandas as pd
+import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
@@ -27,7 +28,8 @@ class BM25Ranker:
         self.bm25 = BM25Okapi(tokenized_docs)
         self.docs = tokenized_docs
 
-    def search(self, query_tokens: List[str], top_k: int = 10):
+    def search(self, query_tokens: List[str], top_k: int = 10) -> List[Tuple[int, float]]:
         scores = self.bm25.get_scores(query_tokens)
+        scores = np.array(scores)
         ranked_indices = scores.argsort()[::-1][:top_k]
         return [(int(idx), float(scores[idx])) for idx in ranked_indices]
