@@ -35,7 +35,7 @@ cd ai-fake-news-sentiment
 
 2. Create and activate virtual environment:
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 ```
 
@@ -49,7 +49,6 @@ pip install -r requirements.txt
 4. Set up environment variables:
 ```bash
 cp .env.example .env
-# Set NYT_API_KEY in .env file
 ```
 
 ## Usage
@@ -57,7 +56,7 @@ cp .env.example .env
 ### Run the complete pipeline:
 
 ```bash
-python main.py
+python3 main.py
 ```
 
 Or use the convenience script:
