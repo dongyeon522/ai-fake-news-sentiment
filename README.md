@@ -4,7 +4,6 @@ UIUC CS410 Final Project — Fall 2025
 AI Fake News Sentiment Tracking and Trend Analysis  
 A Python-based system for news retrieval, sentiment analysis (TextBlob & RoBERTa), and temporal trend visualization.
 
-
 **Project Code + Documentation Submission Link**: https://github.com/dongyeon522/ai-fake-news-sentiment
 
 **Project Presentation Submission Link**: https://mediaspace.illinois.edu/media/t/1_e137pu64 or [here](https://github.com/dongyeon522/ai-fake-news-sentiment/blob/main/CS410_Project_Presentation_dk72.mp4)
@@ -12,6 +11,7 @@ A Python-based system for news retrieval, sentiment analysis (TextBlob & RoBERTa
 **Final Report Link**: https://github.com/dongyeon522/ai-fake-news-sentiment/blob/main/final_report.docx
 
 **TextData Link**: https://textdata.org/submissions/68eb8d21d79b5a018fcc4039 
+
 
 ---
 
@@ -223,6 +223,8 @@ RoBERTa reveals consistently negative sentiment across many months, capturing nu
 ## License
 This repository is provided as part of the UIUC CS410 course project.
 
+---
+
 # Final Report
 
 **Project Title**: AI Fake News Sentiment Tracking and Analysis
@@ -234,6 +236,11 @@ This repository is provided as part of the UIUC CS410 course project.
 **Project Code + Documentation Submission Link**: https://github.com/dongyeon522/ai-fake-news-sentiment
 
 **Project Presentation Submission Link**: https://mediaspace.illinois.edu/media/t/1_e137pu64 or [here](https://github.com/dongyeon522/ai-fake-news-sentiment/blob/main/CS410_Project_Presentation_dk72.mp4)
+
+**Final Report Link**: https://github.com/dongyeon522/ai-fake-news-sentiment/blob/main/final_report.docx
+
+**TextData Link**: https://textdata.org/submissions/68eb8d21d79b5a018fcc4039 
+
 
 #project #report
 
@@ -263,13 +270,13 @@ By comparing TextBlob and RoBERTa, the system demonstrates how different NLP tec
 
 Data is collected directly from the NYT Article Search API.
 
-- **Time Range**: January–December 2024
+- Time Range: January–December 2024
 
-- **Queries**: artificial intelligence, deepfake, fake news, misinformation (12 months × 4 queries = 48 total API calls)
+- Queries: artificial intelligence, deepfake, fake news, misinformation (12 months × 4 queries = 48 total API calls)
 
-- **Total Retrieved Articles**: 459 after deduplication
+- Total Retrieved Articles: 459 after deduplication
 
-- **API Behavior**: maximum 10 items per request, requiring month-by-month batching
+- API Behavior: maximum 10 items per request, requiring month-by-month batching
 
 Preprocessing produced a standardized corpus where each article contains:
 
@@ -299,13 +306,13 @@ Processed datasets are stored under `data/processed/`.
 
 ## 5. Implementation
 
-**Language**: Python 3.10
+Language: Python 3.10
 
-**Libraries**: requests, pandas, numpy, matplotlib, seaborn, transformers
+Libraries: requests, pandas, numpy, matplotlib, seaborn, transformers
 
-**Environment**: macOS / CPU-only
+Environment: macOS / CPU-only
 
-**Runtime**: Full pipeline executes in 3 to 5 minutes (API latency dependent)
+Runtime: Full pipeline executes in 3 to 5 minutes (API latency dependent)
 
 ## 6. Results
 
@@ -313,23 +320,35 @@ Processed datasets are stored under `data/processed/`.
 
 ![image](data/figures/sentiment_over_time_20251205_002.png)
 
-- Sentiment remains close to **neutral**, with only minor fluctuations.
+- Sentiment remains close to neutral, with only minor fluctuations.
 - This behavior reflects TextBlob's tendency to compress polarity for formal news text.
-- Positive/negative classification used the common threshold **±0.1**.
+- Positive/negative classification used the common threshold ±0.1.
 
 ### 6.2 RoBERTa Sentiment Trend
 
 ![image](data/figures/sentiment_over_time_20251205_004.png)
 
-- RoBERTa produces **stronger negative sentiment** across the year.
-- Negative dips occur around:
-  - **February (–0.25)**
-  - **April–June (–0.18 to –0.22)**
-  - **Late fall (–0.20 to –0.36)**
+- RoBERTa produces stronger negative sentiment across the year.
 - This model captures nuance such as concern, risk framing, or negative social impact.
 - Sharp contrast with TextBlob reveals the importance of model selection.
 
-## 7. Evaluation and Effectiveness
+## 7. Analysis
+| Title | Topic |TextBlob |RoBERTa|Interpretation
+|--------|--------|--------|--------|--------|
+|Democrats Must Not Repeat the Mistakes of Globalization|	Risks to labor markets, concerns about economic impact of AI|	–0.3125|	–0.6319|	The article focuses on job displacement and structural risks. RoBERTa detects the negative framing more strongly, while TextBlob remains closer to neutral due to limited contextual understanding.|
+|When the Storm Online Is Worse Than the One Outside|	The dangers of misinformation and its societal impact	|–0.0833	|–0.7183|	The entire article emphasizes harm caused by misinformation. RoBERTa assigns a strongly negative score, while TextBlob captures only mild negativity because it relies on surface-level polarity.|
+|Happy Puppies and Silly Geese: Pushing the Limits of A.I. Absurdity|	Humorous, positive examples of AI image generation|	+0.0333|	+0.5425|	Both models classify the article as positive, but RoBERTa amplifies the sentiment because it detects the playful and lighthearted tone more effectively than lexicon-based methods.|
+|Elon Musk Sues OpenAI and Sam Altman	|Legal dispute, ethical controversy, corporate conflict|	0.25|	-0.6089	|TextBlob incorrectly returns a positive score because phrases like “benefit humanity’’ contain positive words. RoBERTa correctly interprets the article as negative due to its conflict-oriented narrative.|
+
+These examples illustrate the key differences between the two sentiment analysis models:
+
+TextBlob tends to produce neutral or weak sentiment because it counts positive/negative words without considering context. It misclassifies articles involving conflict or risk if they also contain positive-sounding terms.
+
+RoBERTa consistently provides more accurate sentiment scores for news articles, especially when topics involve: misinformation, social harm, legal disputes, or ethical controversies in AI.
+
+Overall, the comparison demonstrates that transformer-based models are far better suited for capturing nuanced sentiment in AI–misinformation reporting.
+
+## 8. Evaluation and Effectiveness
 
 - Coverage Completeness: 459 articles across 12 months ensure balanced yearly analysis.
 
@@ -341,7 +360,7 @@ Processed datasets are stored under `data/processed/`.
 
 - Temporal Insight: Sentiment dips align with real-world AI incidents and policy debates.
 
-## 8. Challenges and Limitations
+## 9. Challenges and Limitations
 
 - NYT API pagination limit (10 articles/page)
 
@@ -351,6 +370,14 @@ Processed datasets are stored under `data/processed/`.
 
 - Some article fields missing or incomplete
 
-## 9. Conclusion
+## 10. Conclusion
 
 This project successfully demonstrates an end-to-end sentiment monitoring system for AI misinformation topics. While TextBlob portrays the news tone as largely neutral, RoBERTa reveals a consistent negative framing throughout 2024, highlighting societal concerns surrounding AI misuse. The contrast between models underscores the importance of model selection in sentiment-driven media analysis. The system offers a solid foundation for future research in misinformation tracking, semantic retrieval, and real-time monitoring.
+
+**Project Code + Documentation Submission Link**: https://github.com/dongyeon522/ai-fake-news-sentiment
+
+**Project Presentation Submission Link**: https://mediaspace.illinois.edu/media/t/1_e137pu64 or [here](https://github.com/dongyeon522/ai-fake-news-sentiment/blob/main/CS410_Project_Presentation_dk72.mp4)
+
+**Final Report Link**: https://github.com/dongyeon522/ai-fake-news-sentiment/blob/main/final_report.docx
+
+**TextData Link**: https://textdata.org/submissions/68eb8d21d79b5a018fcc4039 
