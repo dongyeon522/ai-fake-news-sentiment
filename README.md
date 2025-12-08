@@ -306,13 +306,13 @@ Processed datasets are stored under `data/processed/`.
 
 ## 5. Implementation
 
-Language: Python 3.10
+- Language: Python 3.10
 
-Libraries: requests, pandas, numpy, matplotlib, seaborn, transformers
+- Libraries: requests, pandas, numpy, matplotlib, seaborn, transformers
 
-Environment: macOS / CPU-only
+- Environment: macOS / CPU-only
 
-Runtime: Full pipeline executes in 3 to 5 minutes (API latency dependent)
+- Runtime: Full pipeline executes in 3 to 5 minutes (API latency dependent)
 
 ## 6. Results
 
